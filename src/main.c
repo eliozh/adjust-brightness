@@ -177,57 +177,80 @@ void _adjust_brightness_cl(png_bytep buffer_in, png_bytep buffer_out,
 void _adjust_brightness(png_bytep buffer_in, png_bytep buffer_out,
                         double factor) {
   double r, g, b;
-  double h, s, l;
-  double r_, g_, b_; // rgb value after adjusting brightness
-  double m, M, c;
+  r = buffer_in[0] * factor;
+  g = buffer_in[1] * factor;
+  b = buffer_in[2] * factor;
+
+  if (r > 255) {
+    buffer_out[0] = 255;
+  } else {
+    buffer_out[0] = (int)r;
+  }
+
+  if (g > 255) {
+    buffer_out[1] = 255;
+  } else {
+    buffer_out[1] = (int)g;
+  }
+
+  if (b > 255) {
+    buffer_out[2] = 255;
+  } else {
+    buffer_out[2] = (int)b;
+  }
+
+  /* double r, g, b; */
+  /* double h, s, l; */
+  /* double r_, g_, b_; // rgb value after adjusting brightness */
+  /* double m, M, c; */
 
   /* Convert RGB to HSL */
-  r = buffer_in[0] / 255.0;
-  g = buffer_in[1] / 255.0;
-  b = buffer_in[2] / 255.0;
-
-  m = min_rgb(r, g, b);
-  M = max_rgb(r, g, b);
-  c = M - m;
-
-  l = (m + M) / 2.0;
-
-  if (c == 0) {
-    h = 0;
-    s = 0;
-  } else {
-    s = l > 0.5 ? c / (2 - M - m) : c / (M + m);
-
-    if (M == r) {
-      h = (g - b) / c + (g < b ? 6 : 0);
-      h = fmod(h, 6.0);
-    } else if (M == g) {
-      h = (b - r) / c + 2;
-    } else if (M == b) {
-      h = (r - g) / c + 4;
-    }
-    h /= 6.0;
-  }
-
-  l = l * factor;
-  if (l > 1.0) {
-    l = 1.0;
-  }
+  /* r = buffer_in[0] / 255.0; */
+  /* g = buffer_in[1] / 255.0; */
+  /* b = buffer_in[2] / 255.0; */
+  /**/
+  /* m = min_rgb(r, g, b); */
+  /* M = max_rgb(r, g, b); */
+  /* c = M - m; */
+  /**/
+  /* l = (m + M) / 2.0; */
+  /**/
+  /* if (c == 0) { */
+  /*   h = 0; */
+  /*   s = 0; */
+  /* } else { */
+  /*   s = l > 0.5 ? c / (2 - M - m) : c / (M + m); */
+  /**/
+  /*   if (M == r) { */
+  /*     h = (g - b) / c + (g < b ? 6 : 0); */
+  /*     h = fmod(h, 6.0); */
+  /*   } else if (M == g) { */
+  /*     h = (b - r) / c + 2; */
+  /*   } else if (M == b) { */
+  /*     h = (r - g) / c + 4; */
+  /*   } */
+  /*   h /= 6.0; */
+  /* } */
+  /**/
+  /* l = l * factor; */
+  /* if (l > 1.0) { */
+  /*   l = 1.0; */
+  /* } */
 
   /* Convert HSL to RGB */
-  if (s == 0) {
-    r_ = g_ = b_ = l;
-  } else {
-    double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    double p = 2 * l - q;
-    r_ = hue_to_rgb(p, q, h + 1.0 / 3);
-    g_ = hue_to_rgb(p, q, h);
-    b_ = hue_to_rgb(p, q, h - 1.0 / 3);
-  }
-
-  buffer_out[0] = (int)(r_ * 255);
-  buffer_out[1] = (int)(g_ * 255);
-  buffer_out[2] = (int)(b_ * 255);
+  /* if (s == 0) { */
+  /*   r_ = g_ = b_ = l; */
+  /* } else { */
+  /*   double q = l < 0.5 ? l * (1 + s) : l + s - l * s; */
+  /*   double p = 2 * l - q; */
+  /*   r_ = hue_to_rgb(p, q, h + 1.0 / 3); */
+  /*   g_ = hue_to_rgb(p, q, h); */
+  /*   b_ = hue_to_rgb(p, q, h - 1.0 / 3); */
+  /* } */
+  /**/
+  /* buffer_out[0] = (int)(r_ * 255); */
+  /* buffer_out[1] = (int)(g_ * 255); */
+  /* buffer_out[2] = (int)(b_ * 255); */
 }
 
 double hue_to_rgb(double p, double q, double t) {
